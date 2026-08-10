@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  --color-bg: #faf6f0;
+  --color-surface: #ffffff;
+  --color-primary: #7a2e2e;
+  --color-primary-dark: #5e2222;
+  --color-accent: #f2c14e;
+  --color-ink: #241a15;
+  --color-muted: #8a7b6f;
+  --color-hairline: #e7ddd0;
+  --color-success: #3a7d44;
+  --color-warning: #d9a441;
+  --color-danger: #c0392b;
+
+  --radius-card: 16px;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--color-bg);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+input,
+select,
+textarea,
+button {
+  font-family: inherit;
+}
+
+/* iOS Safari auto-zooms inputs with font-size < 16px on focus */
+input,
+select,
+textarea {
+  font-size: 16px;
+}
