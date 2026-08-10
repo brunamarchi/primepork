@@ -34,17 +34,19 @@ export default function PedidoDetalhe() {
   if (editing) {
     return (
       <AppShell title="Editar pedido">
-        <OrderFieldsForm
-          initialValues={order}
-          submitLabel="Salvar alterações"
-          submitting={updateOrder.isPending}
-          error={updateOrder.error?.message}
-          onSubmit={async (fields) => {
-            await updateOrder.mutateAsync({ id, fields })
-            showToast('Pedido atualizado com sucesso.')
-            setEditing(false)
-          }}
-        />
+        <div className="lg:max-w-xl">
+          <OrderFieldsForm
+            initialValues={order}
+            submitLabel="Salvar alterações"
+            submitting={updateOrder.isPending}
+            error={updateOrder.error?.message}
+            onSubmit={async (fields) => {
+              await updateOrder.mutateAsync({ id, fields })
+              showToast('Pedido atualizado com sucesso.')
+              setEditing(false)
+            }}
+          />
+        </div>
       </AppShell>
     )
   }
@@ -60,7 +62,7 @@ export default function PedidoDetalhe() {
         </Button>
       }
     >
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 lg:max-w-xl">
         <Card>
           <p className="text-sm text-muted">Cliente</p>
           <Link to={`/clientes/${order.client_id}`} className="font-semibold text-primary">

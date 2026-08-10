@@ -17,7 +17,9 @@ export default function NovaCompra() {
 
   return (
     <AppShell title="Nova compra">
-      <PurchaseForm submitLabel="Salvar compra" onSubmit={handleSubmit} submitting={isPending} error={error?.message} />
+      <div className="lg:max-w-xl">
+        <PurchaseForm submitLabel="Salvar compra" onSubmit={handleSubmit} submitting={isPending} error={error?.message} />
+      </div>
     </AppShell>
   )
 }

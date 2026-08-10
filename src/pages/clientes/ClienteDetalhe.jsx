@@ -52,17 +52,19 @@ export default function ClienteDetalhe() {
   if (editing) {
     return (
       <AppShell title="Editar cliente">
-        <ClientForm
-          initialValues={client}
-          submitLabel="Salvar alterações"
-          submitting={updateClient.isPending}
-          error={updateClient.error?.message}
-          onSubmit={async (fields) => {
-            await updateClient.mutateAsync({ id, fields, previous: client })
-            showToast('Cliente atualizado com sucesso.')
-            setEditing(false)
-          }}
-        />
+        <div className="lg:max-w-xl">
+          <ClientForm
+            initialValues={client}
+            submitLabel="Salvar alterações"
+            submitting={updateClient.isPending}
+            error={updateClient.error?.message}
+            onSubmit={async (fields) => {
+              await updateClient.mutateAsync({ id, fields, previous: client })
+              showToast('Cliente atualizado com sucesso.')
+              setEditing(false)
+            }}
+          />
+        </div>
       </AppShell>
     )
   }
@@ -76,7 +78,7 @@ export default function ClienteDetalhe() {
         </Button>
       }
     >
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 lg:max-w-xl">
         <Card>
           <p className="text-sm text-muted">Telefone</p>
           <p className="font-medium text-ink">{client.phone}</p>

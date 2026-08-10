@@ -72,7 +72,7 @@ export default function VendasList() {
         />
       )}
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 lg:grid lg:grid-cols-2 lg:gap-3 xl:grid-cols-3">
         {filteredOrders?.map((order) => {
           const paymentStatus = getDisplayPaymentStatus(order)
           return (

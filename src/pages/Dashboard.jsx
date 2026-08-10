@@ -105,36 +105,41 @@ export default function Dashboard() {
       {isLoading && <Spinner />}
 
       {data && (
-        <div className="flex flex-col gap-4">
-          <div className="hero-gradient rounded-[28px] p-5 text-white shadow-[0_12px_32px_rgba(10,21,48,0.28)]">
+        <div className="flex flex-col gap-4 lg:gap-6">
+          <div className="hero-gradient rounded-[28px] p-5 text-white shadow-[0_12px_32px_rgba(10,21,48,0.28)] lg:p-8">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-sm font-bold">PP</span>
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-sm font-bold lg:hidden">
+                  PP
+                </span>
                 <div>
-                  <p className="text-sm font-semibold leading-tight">Prime Pork</p>
-                  <p className="text-xs text-white/60">Painel</p>
+                  <p className="text-sm font-semibold leading-tight lg:hidden">Prime Pork</p>
+                  <p className="text-xs text-white/60 lg:hidden">Painel</p>
+                  <p className="hidden text-lg font-semibold lg:block">Visão geral do negócio</p>
                 </div>
               </div>
-              <button onClick={signOut} className="text-xs font-medium text-white/70 active:text-white">
+              <button onClick={signOut} className="text-xs font-medium text-white/70 active:text-white lg:hidden">
                 Sair
               </button>
             </div>
 
-            <div className="mt-5">
-              <p className="text-xs text-white/60">Receita no período</p>
-              <p className="text-3xl font-bold tracking-tight">{formatMoney(data.revenue_period)}</p>
-              <span className={`mt-2 inline-block rounded-full px-2.5 py-1 text-xs font-semibold ${alertPillClass}`}>
-                {alertLevel === 'ok' ? 'Estoque saudável' : 'Atenção ao estoque'}
-              </span>
-            </div>
+            <div className="lg:mt-6 lg:flex lg:items-end lg:justify-between lg:gap-8">
+              <div className="mt-5 lg:mt-0">
+                <p className="text-xs text-white/60 lg:text-sm">Receita no período</p>
+                <p className="text-3xl font-bold tracking-tight lg:text-5xl">{formatMoney(data.revenue_period)}</p>
+                <span className={`mt-2 inline-block rounded-full px-2.5 py-1 text-xs font-semibold ${alertPillClass}`}>
+                  {alertLevel === 'ok' ? 'Estoque saudável' : 'Atenção ao estoque'}
+                </span>
+              </div>
 
-            <div className="mt-5 flex gap-3">
-              <Button to="/estoque/nova" variant="pill" className="flex-1">
-                <IconPlus /> Nova compra
-              </Button>
-              <Button to="/vendas/nova" variant="success" className="flex-1">
-                <IconPlus /> Nova venda
-              </Button>
+              <div className="mt-5 flex gap-3 lg:mt-0 lg:shrink-0">
+                <Button to="/estoque/nova" variant="pill" className="flex-1 lg:flex-none lg:px-6">
+                  <IconPlus /> Nova compra
+                </Button>
+                <Button to="/vendas/nova" variant="success" className="flex-1 lg:flex-none lg:px-6">
+                  <IconPlus /> Nova venda
+                </Button>
+              </div>
             </div>
           </div>
 
@@ -155,82 +160,85 @@ export default function Dashboard() {
             </Link>
           )}
 
-          <div>
-            <p className="mb-2 text-sm font-semibold text-ink">Financeiro</p>
-            <Card className="grid grid-cols-2 gap-3">
-              <div>
-                <p className="text-sm text-muted">A receber</p>
-                <p className="text-xl font-bold text-ink">{formatMoney(data.receivable_total)}</p>
-                <p className="text-xs text-muted">
-                  {data.receivable_count} pedido{data.receivable_count === 1 ? '' : 's'}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-muted">Atrasado</p>
-                <p className={`text-xl font-bold ${Number(data.overdue_total) > 0 ? 'text-danger' : 'text-ink'}`}>
-                  {formatMoney(data.overdue_total)}
-                </p>
-                <p className="text-xs text-muted">
-                  {data.overdue_count} pedido{data.overdue_count === 1 ? '' : 's'}
-                </p>
-              </div>
-            </Card>
-          </div>
-
-          <Link to="/estoque" className="block transition-transform duration-150 ease-out active:scale-[0.98]">
-            <Card className="flex items-center gap-3">
-              <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${stockStatusIconClass}`}>
-                <IconBox />
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm text-muted">Estoque</p>
-                <div className="flex items-baseline gap-2">
-                  <p className="text-xl font-bold text-ink">{formatKg(data.stock_weight_kg)}</p>
-                  {stockStatusBadge}
-                </div>
-              </div>
-              <IconChevronRight className="text-muted/60" />
-            </Card>
-          </Link>
-
-          <div className="grid grid-cols-2 gap-3">
-            <Card className="!p-3">
-              <p className="text-xs text-muted">Pedidos pendentes</p>
-              <p className="whitespace-nowrap text-lg font-bold text-ink">{formatKg(data.pending_demand_kg)}</p>
-              <p className="text-xs text-muted">
-                {data.pending_orders_count} pedido{data.pending_orders_count === 1 ? '' : 's'}
-              </p>
-            </Card>
-            <Card className="!p-3">
-              <p className="text-xs text-muted">Estoque dura</p>
-              <p className="whitespace-nowrap text-lg font-bold text-ink">{daysRemaining != null ? `~${daysRemaining} dia${daysRemaining === 1 ? '' : 's'}` : '—'}</p>
-              <Button to="/estoque/configuracoes" variant="ghost" className="!mt-0 !min-h-0 !px-0 text-xs">
-                Ajustar limite
-              </Button>
-            </Card>
-          </div>
-
-          {riskCounts && (
+          <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-4">
             <div>
-              <p className="mb-2 text-sm font-semibold text-ink">Clientes</p>
+              <p className="mb-2 text-sm font-semibold text-ink">Financeiro</p>
               <Card className="grid grid-cols-2 gap-3">
                 <div>
-                  <p className="text-sm text-muted">Em risco (atrasados)</p>
-                  <p className={`text-xl font-bold ${riskCounts.red > 0 ? 'text-danger' : 'text-ink'}`}>{riskCounts.red}</p>
+                  <p className="text-sm text-muted">A receber</p>
+                  <p className="text-xl font-bold text-ink">{formatMoney(data.receivable_total)}</p>
+                  <p className="text-xs text-muted">
+                    {data.receivable_count} pedido{data.receivable_count === 1 ? '' : 's'}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted">Recompra próxima</p>
-                  <p className="text-xl font-bold text-warning">{riskCounts.yellow}</p>
+                  <p className="text-sm text-muted">Atrasado</p>
+                  <p className={`text-xl font-bold ${Number(data.overdue_total) > 0 ? 'text-danger' : 'text-ink'}`}>
+                    {formatMoney(data.overdue_total)}
+                  </p>
+                  <p className="text-xs text-muted">
+                    {data.overdue_count} pedido{data.overdue_count === 1 ? '' : 's'}
+                  </p>
                 </div>
               </Card>
-              <Button to="/mapa" variant="ghost" className="!mt-1 !min-h-0 !px-0 text-xs">
-                Ver no mapa
-              </Button>
             </div>
-          )}
 
-          <div>
-            <div className="relative mb-3">
+            <Link to="/estoque" className="mt-4 block transition-transform duration-150 ease-out active:scale-[0.98] lg:mt-0">
+              <p className="mb-2 text-sm font-semibold text-ink">Estoque</p>
+              <Card className="flex items-center gap-3">
+                <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${stockStatusIconClass}`}>
+                  <IconBox />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm text-muted">Disponível</p>
+                  <div className="flex items-baseline gap-2">
+                    <p className="text-xl font-bold text-ink">{formatKg(data.stock_weight_kg)}</p>
+                    {stockStatusBadge}
+                  </div>
+                </div>
+                <IconChevronRight className="text-muted/60" />
+              </Card>
+            </Link>
+
+            <div className="mt-4 grid grid-cols-2 gap-3 lg:mt-4">
+              <Card className="!p-3">
+                <p className="text-xs text-muted">Pedidos pendentes</p>
+                <p className="whitespace-nowrap text-lg font-bold text-ink">{formatKg(data.pending_demand_kg)}</p>
+                <p className="text-xs text-muted">
+                  {data.pending_orders_count} pedido{data.pending_orders_count === 1 ? '' : 's'}
+                </p>
+              </Card>
+              <Card className="!p-3">
+                <p className="text-xs text-muted">Estoque dura</p>
+                <p className="whitespace-nowrap text-lg font-bold text-ink">{daysRemaining != null ? `~${daysRemaining} dia${daysRemaining === 1 ? '' : 's'}` : '—'}</p>
+                <Button to="/estoque/configuracoes" variant="ghost" className="!mt-0 !min-h-0 !px-0 text-xs">
+                  Ajustar limite
+                </Button>
+              </Card>
+            </div>
+
+            {riskCounts && (
+              <div className="mt-4 lg:mt-4">
+                <p className="mb-2 text-sm font-semibold text-ink">Clientes</p>
+                <Card className="grid grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-sm text-muted">Em risco (atrasados)</p>
+                    <p className={`text-xl font-bold ${riskCounts.red > 0 ? 'text-danger' : 'text-ink'}`}>{riskCounts.red}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted">Recompra próxima</p>
+                    <p className="text-xl font-bold text-warning">{riskCounts.yellow}</p>
+                  </div>
+                </Card>
+                <Button to="/mapa" variant="ghost" className="!mt-1 !min-h-0 !px-0 text-xs">
+                  Ver no mapa
+                </Button>
+              </div>
+            )}
+          </div>
+
+          <div className="lg:flex lg:items-start lg:gap-6">
+            <div className="relative lg:w-56 lg:shrink-0">
               <select
                 value={preset}
                 onChange={(e) => setPreset(e.target.value)}
@@ -243,26 +251,26 @@ export default function Dashboard() {
                 ))}
               </select>
               <IconChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted" />
+
+              {preset === 'personalizado' && (
+                <div className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-1">
+                  <input
+                    type="date"
+                    className={inputClass}
+                    value={custom?.from ?? range.from}
+                    onChange={(e) => setCustom({ from: e.target.value, to: custom?.to ?? range.to })}
+                  />
+                  <input
+                    type="date"
+                    className={inputClass}
+                    value={custom?.to ?? range.to}
+                    onChange={(e) => setCustom({ from: custom?.from ?? range.from, to: e.target.value })}
+                  />
+                </div>
+              )}
             </div>
 
-            {preset === 'personalizado' && (
-              <div className="mb-3 grid grid-cols-2 gap-3">
-                <input
-                  type="date"
-                  className={inputClass}
-                  value={custom?.from ?? range.from}
-                  onChange={(e) => setCustom({ from: e.target.value, to: custom?.to ?? range.to })}
-                />
-                <input
-                  type="date"
-                  className={inputClass}
-                  value={custom?.to ?? range.to}
-                  onChange={(e) => setCustom({ from: custom?.from ?? range.from, to: e.target.value })}
-                />
-              </div>
-            )}
-
-            <div className="grid grid-cols-3 gap-2">
+            <div className="mt-3 grid grid-cols-3 gap-2 lg:mt-0 lg:flex-1">
               <Card className="!p-3">
                 <p className="text-xs text-muted">Pedidos</p>
                 <p className="whitespace-nowrap text-lg font-bold text-ink">{data.orders_count_period}</p>

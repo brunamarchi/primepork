@@ -31,18 +31,20 @@ export default function NovaVenda() {
 
   return (
     <AppShell title="Nova venda">
-      <div className="mb-4">
-        <Field label="Cliente" required>
-          <ClientPicker selectedClient={selectedClient} onSelect={setSelectedClient} returnTo="/vendas/nova" />
-        </Field>
+      <div className="lg:max-w-xl">
+        <div className="mb-4">
+          <Field label="Cliente" required>
+            <ClientPicker selectedClient={selectedClient} onSelect={setSelectedClient} returnTo="/vendas/nova" />
+          </Field>
+        </div>
+        <OrderFieldsForm
+          submitLabel="Lançar venda"
+          onSubmit={handleSubmit}
+          submitting={isPending}
+          error={error?.message}
+          disabled={!selectedClient}
+        />
       </div>
-      <OrderFieldsForm
-        submitLabel="Lançar venda"
-        onSubmit={handleSubmit}
-        submitting={isPending}
-        error={error?.message}
-        disabled={!selectedClient}
-      />
     </AppShell>
   )
 }

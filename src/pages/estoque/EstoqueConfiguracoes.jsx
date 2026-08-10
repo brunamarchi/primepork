@@ -36,7 +36,7 @@ export default function EstoqueConfiguracoes() {
 
   return (
     <AppShell title="Configurações de estoque">
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4 lg:max-w-xl">
         <Field
           label="Limite mínimo de estoque (kg)"
           required

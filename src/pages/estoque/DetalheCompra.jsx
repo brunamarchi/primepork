@@ -31,17 +31,19 @@ export default function DetalheCompra() {
   if (editing) {
     return (
       <AppShell title="Editar compra">
-        <PurchaseForm
-          initialValues={purchase}
-          submitLabel="Salvar alterações"
-          submitting={updatePurchase.isPending}
-          error={updatePurchase.error?.message}
-          onSubmit={async (fields) => {
-            await updatePurchase.mutateAsync({ id, fields })
-            showToast('Compra atualizada com sucesso.')
-            setEditing(false)
-          }}
-        />
+        <div className="lg:max-w-xl">
+          <PurchaseForm
+            initialValues={purchase}
+            submitLabel="Salvar alterações"
+            submitting={updatePurchase.isPending}
+            error={updatePurchase.error?.message}
+            onSubmit={async (fields) => {
+              await updatePurchase.mutateAsync({ id, fields })
+              showToast('Compra atualizada com sucesso.')
+              setEditing(false)
+            }}
+          />
+        </div>
       </AppShell>
     )
   }
@@ -58,7 +60,7 @@ export default function DetalheCompra() {
         </Button>
       }
     >
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 lg:max-w-xl">
         <Card className="grid grid-cols-2 gap-3">
           <div>
             <p className="text-sm text-muted">Data</p>

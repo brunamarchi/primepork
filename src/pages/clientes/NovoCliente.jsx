@@ -23,7 +23,9 @@ export default function NovoCliente() {
 
   return (
     <AppShell title="Novo cliente">
-      <ClientForm submitLabel="Cadastrar cliente" onSubmit={handleSubmit} submitting={isPending} error={error?.message} />
+      <div className="lg:max-w-xl">
+        <ClientForm submitLabel="Cadastrar cliente" onSubmit={handleSubmit} submitting={isPending} error={error?.message} />
+      </div>
     </AppShell>
   )
 }

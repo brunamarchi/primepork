@@ -32,7 +32,7 @@ export default function ClientesList() {
     >
       <input
         placeholder="Buscar por nome ou telefone…"
-        className={`${inputClass} mb-4 w-full`}
+        className={`${inputClass} mb-4 w-full lg:max-w-sm`}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
@@ -48,7 +48,7 @@ export default function ClientesList() {
         />
       )}
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 lg:grid lg:grid-cols-2 lg:gap-3 xl:grid-cols-3">
         {clients?.map((client) => (
           <Link
             key={client.id}

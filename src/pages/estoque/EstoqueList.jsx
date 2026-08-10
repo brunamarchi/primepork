@@ -72,7 +72,7 @@ export default function EstoqueList() {
         </div>
       ) : (
         stock && (
-          <div className="mb-4 flex flex-col gap-3">
+          <div className="mb-4 grid grid-cols-1 gap-3 lg:grid-cols-[1.3fr_1fr]">
             <Card className={`!border-transparent !text-white ${STOCK_STATUS[stockStatus].cardClass}`}>
               <div className="flex items-center justify-between">
                 <p className="text-sm text-white/80">Estoque disponível</p>
@@ -111,7 +111,7 @@ export default function EstoqueList() {
         />
       )}
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 lg:grid lg:grid-cols-2 lg:gap-3 xl:grid-cols-3">
         {purchases?.map((p) => {
           const loss = Number(p.raw_weight_kg) - Number(p.yield_weight_kg)
           const pct = (loss / Number(p.raw_weight_kg)) * 100
