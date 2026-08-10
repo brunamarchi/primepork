@@ -21,7 +21,10 @@ export function ToastProvider({ children }) {
         style={{ bottom: 'calc(env(safe-area-inset-bottom) + 72px)' }}
       >
         {toasts.map((t) => (
-          <div key={t.id} className="rounded-card bg-ink px-4 py-2.5 text-sm font-medium text-white shadow-lg">
+          <div
+            key={t.id}
+            className="animate-toast-in rounded-card bg-ink px-4 py-2.5 text-sm font-medium text-white shadow-lg"
+          >
             {t.message}
           </div>
         ))}

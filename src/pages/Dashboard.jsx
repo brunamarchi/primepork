@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import AppShell from '../components/layout/AppShell'
 import Card from '../components/ui/Card'
 import Spinner from '../components/ui/Spinner'
@@ -18,12 +19,6 @@ function formatKg(value) {
   return `${Number(value ?? 0).toFixed(1)} kg`
 }
 
-const QUICK_LINKS = [
-  { to: '/estoque', label: 'Estoque', icon: IconBox },
-  { to: '/clientes', label: 'Clientes', icon: IconUsers },
-  { to: '/mapa', label: 'Mapa', icon: IconMap },
-]
-
 function IconPlus() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -42,22 +37,28 @@ function IconBox() {
   )
 }
 
-function IconUsers() {
+function IconChevronRight({ className = '' }) {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <circle cx="9" cy="8" r="3.2" />
-      <path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6" strokeLinecap="round" />
-      <path d="M16 4.6c1.6.5 2.8 2 2.8 3.7 0 1.7-1.2 3.2-2.8 3.7" strokeLinecap="round" />
-      <path d="M15 14c2.9.5 4.8 2.5 4.8 6" strokeLinecap="round" />
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className={`shrink-0 ${className}`}>
+      <path d="M9 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }
 
-function IconMap() {
+function IconChevronDown({ className = '' }) {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M9 4L3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5 9 4z" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M9 4v13M15 6.5v13" strokeLinecap="round" />
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className={`shrink-0 ${className}`}>
+      <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function IconAlertTriangle() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M12 3.5 21.5 20h-19L12 3.5z" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 10v4.5" strokeLinecap="round" />
+      <circle cx="12" cy="17.5" r="0.9" fill="currentColor" stroke="none" />
     </svg>
   )
 }
@@ -86,6 +87,18 @@ export default function Dashboard() {
         ? 'bg-warning/15 text-warning'
         : 'bg-success/15 text-success'
 
+  const stockStatus = data && Number(data.stock_weight_kg) <= 0 ? 'danger' : hasShortfall || isLowStock ? 'warning' : 'success'
+  const stockStatusIconClass = {
+    danger: 'bg-danger/15 text-danger',
+    warning: 'bg-warning/15 text-warning',
+    success: 'bg-success/15 text-success',
+  }[stockStatus]
+  const stockStatusBadge = {
+    danger: <span className="rounded-full bg-danger/15 px-2 py-0.5 text-xs font-semibold text-danger">negativo</span>,
+    warning: <span className="rounded-full bg-warning/15 px-2 py-0.5 text-xs font-semibold text-warning">baixo</span>,
+    success: null,
+  }[stockStatus]
+
   return (
     <AppShell>
       <ErrorBanner message={error?.message} />
@@ -111,7 +124,7 @@ export default function Dashboard() {
               <p className="text-xs text-white/60">Receita no período</p>
               <p className="text-3xl font-bold tracking-tight">{formatMoney(data.revenue_period)}</p>
               <span className={`mt-2 inline-block rounded-full px-2.5 py-1 text-xs font-semibold ${alertPillClass}`}>
-                {alertLevel === 'ok' ? 'Estoque saudável' : 'Atenção ao estoque'} · {formatKg(data.stock_weight_kg)}
+                {alertLevel === 'ok' ? 'Estoque saudável' : 'Atenção ao estoque'}
               </span>
             </div>
 
@@ -119,62 +132,117 @@ export default function Dashboard() {
               <Button to="/estoque/nova" variant="pill" className="flex-1">
                 <IconPlus /> Nova compra
               </Button>
-              <Button to="/vendas/nova" variant="pill" className="flex-1">
+              <Button to="/vendas/nova" variant="success" className="flex-1">
                 <IconPlus /> Nova venda
               </Button>
             </div>
           </div>
 
-          <Card>
-            <div className="flex flex-col gap-1 text-sm text-ink">
-              <p>
-                Estoque atual: <strong>{formatKg(data.stock_weight_kg)}</strong>
-                {isLowStock && <span className="text-danger"> · abaixo do mínimo configurado ({formatKg(data.low_stock_threshold_kg)})</span>}
-              </p>
-              <p>
-                Pedidos pendentes: <strong>{formatKg(data.pending_demand_kg)}</strong> ({data.pending_orders_count} pedido
-                {data.pending_orders_count === 1 ? '' : 's'})
-              </p>
-              {daysRemaining != null && (
-                <p>
-                  No ritmo atual de vendas, o estoque dura <strong>~{daysRemaining} dia{daysRemaining === 1 ? '' : 's'}</strong>.
-                </p>
-              )}
-            </div>
-            {hasShortfall && (
-              <p className="mt-2 text-base font-bold text-danger">
-                Comprar ≈ {Number(data.raw_material_needed_kg).toFixed(1)} kg de matéria-prima
-              </p>
-            )}
-            <Button to="/estoque/configuracoes" variant="ghost" className="!mt-2 !min-h-0 !px-0 text-xs">
-              Ajustar limite de estoque baixo
-            </Button>
-          </Card>
-
-          <div className="grid grid-cols-3 gap-3">
-            {QUICK_LINKS.map(({ to, label, icon: Icon }) => (
-              <Button key={to} to={to} variant="secondary" className="!min-h-0 flex-col gap-2 !rounded-card py-4 text-xs">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-bg text-primary">
-                  <Icon />
+          {hasShortfall && (
+            <Link to="/estoque/nova" className="block transition-transform duration-150 ease-out active:scale-[0.98]">
+              <Card className="!border-danger/30 !bg-danger/10 flex items-start gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-danger/15 text-danger">
+                  <IconAlertTriangle />
                 </span>
-                {label}
-              </Button>
-            ))}
-          </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-danger">Comprar matéria-prima</p>
+                  <p className="text-sm text-danger/80">
+                    ≈ {Number(data.raw_material_needed_kg).toFixed(1)} kg necessários para atender a demanda pendente
+                  </p>
+                </div>
+                <IconChevronRight className="mt-2 text-danger/50" />
+              </Card>
+            </Link>
+          )}
 
           <div>
-            <div className="mb-3 flex gap-2 overflow-x-auto">
-              {PERIOD_PRESETS.map((p) => (
-                <button
-                  key={p.key}
-                  onClick={() => setPreset(p.key)}
-                  className={`min-h-[36px] whitespace-nowrap rounded-card border px-3 text-sm font-medium ${
-                    preset === p.key ? 'border-primary bg-primary text-white' : 'border-hairline bg-surface text-muted'
-                  }`}
-                >
-                  {p.label}
-                </button>
-              ))}
+            <p className="mb-2 text-sm font-semibold text-ink">Financeiro</p>
+            <Card className="grid grid-cols-2 gap-3">
+              <div>
+                <p className="text-sm text-muted">A receber</p>
+                <p className="text-xl font-bold text-ink">{formatMoney(data.receivable_total)}</p>
+                <p className="text-xs text-muted">
+                  {data.receivable_count} pedido{data.receivable_count === 1 ? '' : 's'}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-muted">Atrasado</p>
+                <p className={`text-xl font-bold ${Number(data.overdue_total) > 0 ? 'text-danger' : 'text-ink'}`}>
+                  {formatMoney(data.overdue_total)}
+                </p>
+                <p className="text-xs text-muted">
+                  {data.overdue_count} pedido{data.overdue_count === 1 ? '' : 's'}
+                </p>
+              </div>
+            </Card>
+          </div>
+
+          <Link to="/estoque" className="block transition-transform duration-150 ease-out active:scale-[0.98]">
+            <Card className="flex items-center gap-3">
+              <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${stockStatusIconClass}`}>
+                <IconBox />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm text-muted">Estoque</p>
+                <div className="flex items-baseline gap-2">
+                  <p className="text-xl font-bold text-ink">{formatKg(data.stock_weight_kg)}</p>
+                  {stockStatusBadge}
+                </div>
+              </div>
+              <IconChevronRight className="text-muted/60" />
+            </Card>
+          </Link>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Card className="!p-3">
+              <p className="text-xs text-muted">Pedidos pendentes</p>
+              <p className="whitespace-nowrap text-lg font-bold text-ink">{formatKg(data.pending_demand_kg)}</p>
+              <p className="text-xs text-muted">
+                {data.pending_orders_count} pedido{data.pending_orders_count === 1 ? '' : 's'}
+              </p>
+            </Card>
+            <Card className="!p-3">
+              <p className="text-xs text-muted">Estoque dura</p>
+              <p className="whitespace-nowrap text-lg font-bold text-ink">{daysRemaining != null ? `~${daysRemaining} dia${daysRemaining === 1 ? '' : 's'}` : '—'}</p>
+              <Button to="/estoque/configuracoes" variant="ghost" className="!mt-0 !min-h-0 !px-0 text-xs">
+                Ajustar limite
+              </Button>
+            </Card>
+          </div>
+
+          {riskCounts && (
+            <div>
+              <p className="mb-2 text-sm font-semibold text-ink">Clientes</p>
+              <Card className="grid grid-cols-2 gap-3">
+                <div>
+                  <p className="text-sm text-muted">Em risco (atrasados)</p>
+                  <p className={`text-xl font-bold ${riskCounts.red > 0 ? 'text-danger' : 'text-ink'}`}>{riskCounts.red}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted">Recompra próxima</p>
+                  <p className="text-xl font-bold text-warning">{riskCounts.yellow}</p>
+                </div>
+              </Card>
+              <Button to="/mapa" variant="ghost" className="!mt-1 !min-h-0 !px-0 text-xs">
+                Ver no mapa
+              </Button>
+            </div>
+          )}
+
+          <div>
+            <div className="relative mb-3">
+              <select
+                value={preset}
+                onChange={(e) => setPreset(e.target.value)}
+                className={`${inputClass} w-full appearance-none pr-10 font-medium`}
+              >
+                {PERIOD_PRESETS.map((p) => (
+                  <option key={p.key} value={p.key}>
+                    {p.label}
+                  </option>
+                ))}
+              </select>
+              <IconChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted" />
             </div>
 
             {preset === 'personalizado' && (
@@ -209,47 +277,6 @@ export default function Dashboard() {
               </Card>
             </div>
           </div>
-
-          <div>
-            <p className="mb-2 text-sm font-semibold text-ink">Financeiro</p>
-            <Card className="grid grid-cols-2 gap-3">
-              <div>
-                <p className="text-sm text-muted">A receber</p>
-                <p className="text-xl font-bold text-ink">{formatMoney(data.receivable_total)}</p>
-                <p className="text-xs text-muted">
-                  {data.receivable_count} pedido{data.receivable_count === 1 ? '' : 's'}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-muted">Atrasado</p>
-                <p className={`text-xl font-bold ${Number(data.overdue_total) > 0 ? 'text-danger' : 'text-ink'}`}>
-                  {formatMoney(data.overdue_total)}
-                </p>
-                <p className="text-xs text-muted">
-                  {data.overdue_count} pedido{data.overdue_count === 1 ? '' : 's'}
-                </p>
-              </div>
-            </Card>
-          </div>
-
-          {riskCounts && (
-            <div>
-              <p className="mb-2 text-sm font-semibold text-ink">Clientes</p>
-              <Card className="grid grid-cols-2 gap-3">
-                <div>
-                  <p className="text-sm text-muted">Em risco (atrasados)</p>
-                  <p className={`text-xl font-bold ${riskCounts.red > 0 ? 'text-danger' : 'text-ink'}`}>{riskCounts.red}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted">Recompra próxima</p>
-                  <p className="text-xl font-bold text-warning">{riskCounts.yellow}</p>
-                </div>
-              </Card>
-              <Button to="/mapa" variant="ghost" className="!mt-1 !min-h-0 !px-0 text-xs">
-                Ver no mapa
-              </Button>
-            </div>
-          )}
         </div>
       )}
     </AppShell>

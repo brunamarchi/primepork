@@ -1,19 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabaseClient'
 
-export function useOrders(statusFilter = 'todos') {
+export function useOrders() {
   return useQuery({
-    queryKey: ['orders', statusFilter],
+    queryKey: ['orders'],
     queryFn: async () => {
-      let query = supabase
+      const { data, error } = await supabase
         .from('orders')
         .select('*, client:clients(id, full_name, phone)')
         .order('order_date', { ascending: false })
         .order('created_at', { ascending: false })
-      if (statusFilter !== 'todos') {
-        query = query.eq('status', statusFilter)
-      }
-      const { data, error } = await query
       if (error) throw error
       return data
     },

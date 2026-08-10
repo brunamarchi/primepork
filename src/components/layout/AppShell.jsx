@@ -12,7 +12,7 @@ export default function AppShell({ title, action, children }) {
           {action}
         </header>
       )}
-      <main className="px-4 py-4">{children}</main>
+      <main className="animate-page-in px-4 py-4">{children}</main>
       <BottomNav />
     </div>
   )

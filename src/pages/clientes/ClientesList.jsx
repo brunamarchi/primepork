@@ -3,11 +3,19 @@ import { Link } from 'react-router-dom'
 import AppShell from '../../components/layout/AppShell'
 import Button from '../../components/ui/Button'
 import Card from '../../components/ui/Card'
-import Spinner from '../../components/ui/Spinner'
+import { SkeletonList } from '../../components/ui/Skeleton'
 import EmptyState from '../../components/ui/EmptyState'
 import ErrorBanner from '../../components/ui/ErrorBanner'
 import { inputClass } from '../../components/ui/Field'
 import { useClients } from '../../hooks/useClients'
+
+function ChevronRight() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="shrink-0 text-muted/60">
+      <path d="M9 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
 
 export default function ClientesList() {
   const [search, setSearch] = useState('')
@@ -29,7 +37,7 @@ export default function ClientesList() {
         onChange={(e) => setSearch(e.target.value)}
       />
 
-      {isLoading && <Spinner />}
+      {isLoading && <SkeletonList />}
       <ErrorBanner message={error?.message} />
 
       {clients && clients.length === 0 && (
@@ -42,15 +50,20 @@ export default function ClientesList() {
 
       <div className="flex flex-col gap-2">
         {clients?.map((client) => (
-          <Link key={client.id} to={`/clientes/${client.id}`}>
-            <Card className="flex items-center justify-between">
-              <div>
+          <Link
+            key={client.id}
+            to={`/clientes/${client.id}`}
+            className="block transition-transform duration-150 ease-out active:scale-[0.98]"
+          >
+            <Card className="flex items-center justify-between gap-3">
+              <div className="min-w-0 flex-1">
                 <p className="font-semibold text-ink">{client.full_name}</p>
                 <p className="text-sm text-muted">{client.phone}</p>
               </div>
               {client.geocode_status !== 'success' && (
-                <span className="rounded-full bg-bg px-2 py-1 text-xs text-muted">sem localização</span>
+                <span className="shrink-0 rounded-full bg-bg px-2 py-1 text-xs text-muted">sem localização</span>
               )}
+              <ChevronRight />
             </Card>
           </Link>
         ))}
