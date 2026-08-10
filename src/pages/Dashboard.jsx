@@ -18,6 +18,50 @@ function formatKg(value) {
   return `${Number(value ?? 0).toFixed(1)} kg`
 }
 
+const QUICK_LINKS = [
+  { to: '/estoque', label: 'Estoque', icon: IconBox },
+  { to: '/clientes', label: 'Clientes', icon: IconUsers },
+  { to: '/mapa', label: 'Mapa', icon: IconMap },
+]
+
+function IconPlus() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+      <path d="M12 5v14M5 12h14" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function IconBox() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M21 8l-9-5-9 5 9 5 9-5z" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M3 8v8l9 5 9-5V8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 13v8" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function IconUsers() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <circle cx="9" cy="8" r="3.2" />
+      <path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6" strokeLinecap="round" />
+      <path d="M16 4.6c1.6.5 2.8 2 2.8 3.7 0 1.7-1.2 3.2-2.8 3.7" strokeLinecap="round" />
+      <path d="M15 14c2.9.5 4.8 2.5 4.8 6" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function IconMap() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M9 4L3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5 9 4z" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M9 4v13M15 6.5v13" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 export default function Dashboard() {
   const { signOut } = useAuth()
   const [preset, setPreset] = useState('mes')
@@ -35,33 +79,54 @@ export default function Dashboard() {
   const avgTicket = data && data.orders_count_period > 0 ? Number(data.revenue_period) / Number(data.orders_count_period) : null
   const lossPct = data?.avg_yield_ratio != null ? (1 - Number(data.avg_yield_ratio)) * 100 : null
 
+  const alertPillClass =
+    alertLevel === 'danger'
+      ? 'bg-danger/15 text-danger'
+      : alertLevel === 'warning'
+        ? 'bg-warning/15 text-warning'
+        : 'bg-success/15 text-success'
+
   return (
-    <AppShell
-      title="Painel"
-      action={
-        <Button variant="ghost" className="!min-h-0 !px-2 text-xs" onClick={signOut}>
-          Sair
-        </Button>
-      }
-    >
+    <AppShell>
       <ErrorBanner message={error?.message} />
       {isLoading && <Spinner />}
 
       {data && (
         <div className="flex flex-col gap-4">
-          <Card
-            className={
-              alertLevel === 'danger'
-                ? 'border-danger bg-danger/10'
-                : alertLevel === 'warning'
-                  ? 'border-warning bg-warning/10'
-                  : 'border-success bg-success/10'
-            }
-          >
-            <p className="text-sm font-semibold text-ink">
-              {alertLevel === 'ok' ? 'Estoque saudável' : 'Atenção ao estoque'}
-            </p>
-            <div className="mt-1 flex flex-col gap-1 text-sm text-ink">
+          <div className="hero-gradient rounded-[28px] p-5 text-white shadow-[0_12px_32px_rgba(10,21,48,0.28)]">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-sm font-bold">PP</span>
+                <div>
+                  <p className="text-sm font-semibold leading-tight">Prime Pork</p>
+                  <p className="text-xs text-white/60">Painel</p>
+                </div>
+              </div>
+              <button onClick={signOut} className="text-xs font-medium text-white/70 active:text-white">
+                Sair
+              </button>
+            </div>
+
+            <div className="mt-5">
+              <p className="text-xs text-white/60">Receita no período</p>
+              <p className="text-3xl font-bold tracking-tight">{formatMoney(data.revenue_period)}</p>
+              <span className={`mt-2 inline-block rounded-full px-2.5 py-1 text-xs font-semibold ${alertPillClass}`}>
+                {alertLevel === 'ok' ? 'Estoque saudável' : 'Atenção ao estoque'} · {formatKg(data.stock_weight_kg)}
+              </span>
+            </div>
+
+            <div className="mt-5 flex gap-3">
+              <Button to="/estoque/nova" variant="pill" className="flex-1">
+                <IconPlus /> Nova compra
+              </Button>
+              <Button to="/vendas/nova" variant="pill" className="flex-1">
+                <IconPlus /> Nova venda
+              </Button>
+            </div>
+          </div>
+
+          <Card>
+            <div className="flex flex-col gap-1 text-sm text-ink">
               <p>
                 Estoque atual: <strong>{formatKg(data.stock_weight_kg)}</strong>
                 {isLowStock && <span className="text-danger"> · abaixo do mínimo configurado ({formatKg(data.low_stock_threshold_kg)})</span>}
@@ -85,6 +150,17 @@ export default function Dashboard() {
               Ajustar limite de estoque baixo
             </Button>
           </Card>
+
+          <div className="grid grid-cols-3 gap-3">
+            {QUICK_LINKS.map(({ to, label, icon: Icon }) => (
+              <Button key={to} to={to} variant="secondary" className="!min-h-0 flex-col gap-2 !rounded-card py-4 text-xs">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-bg text-primary">
+                  <Icon />
+                </span>
+                {label}
+              </Button>
+            ))}
+          </div>
 
           <div>
             <div className="mb-3 flex gap-2 overflow-x-auto">
@@ -118,22 +194,18 @@ export default function Dashboard() {
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-3">
-              <Card>
-                <p className="text-sm text-muted">Pedidos no período</p>
-                <p className="text-2xl font-bold text-ink">{data.orders_count_period}</p>
+            <div className="grid grid-cols-3 gap-2">
+              <Card className="!p-3">
+                <p className="text-xs text-muted">Pedidos</p>
+                <p className="whitespace-nowrap text-lg font-bold text-ink">{data.orders_count_period}</p>
               </Card>
-              <Card>
-                <p className="text-sm text-muted">Receita no período</p>
-                <p className="text-2xl font-bold text-ink">{formatMoney(data.revenue_period)}</p>
+              <Card className="!p-3">
+                <p className="text-xs text-muted">Ticket médio</p>
+                <p className="whitespace-nowrap text-base font-bold text-ink">{avgTicket != null ? formatMoney(avgTicket) : '—'}</p>
               </Card>
-              <Card>
-                <p className="text-sm text-muted">Ticket médio</p>
-                <p className="text-2xl font-bold text-ink">{avgTicket != null ? formatMoney(avgTicket) : '—'}</p>
-              </Card>
-              <Card>
-                <p className="text-sm text-muted">Perda de produção</p>
-                <p className="text-2xl font-bold text-ink">{lossPct != null ? `${lossPct.toFixed(1)}%` : '—'}</p>
+              <Card className="!p-3">
+                <p className="text-xs text-muted">Perda</p>
+                <p className="whitespace-nowrap text-lg font-bold text-ink">{lossPct != null ? `${lossPct.toFixed(1)}%` : '—'}</p>
               </Card>
             </div>
           </div>

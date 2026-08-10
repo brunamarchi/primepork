@@ -11,24 +11,32 @@ const TABS = [
 export default function BottomNav() {
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-20 flex border-t border-hairline bg-surface"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      className="fixed bottom-0 left-0 right-0 z-20 px-3"
+      style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 10px)' }}
     >
-      {TABS.map(({ to, label, icon: Icon }) => (
-        <NavLink
-          key={to}
-          to={to}
-          end={to === '/'}
-          className={({ isActive }) =>
-            `flex min-h-[56px] flex-1 flex-col items-center justify-center gap-0.5 py-2 text-xs font-medium ${
-              isActive ? 'text-primary' : 'text-muted'
-            }`
-          }
-        >
-          <Icon />
-          <span>{label}</span>
-        </NavLink>
-      ))}
+      <div className="mx-auto flex max-w-md items-center justify-between rounded-[28px] bg-surface px-2 py-2 shadow-[0_8px_28px_rgba(22,33,58,0.18)]">
+        {TABS.map(({ to, label, icon: Icon }) => (
+          <NavLink
+            key={to}
+            to={to}
+            end={to === '/'}
+            className="flex min-h-[52px] flex-1 flex-col items-center justify-center gap-0.5 py-1 text-[11px] font-medium text-muted"
+          >
+            {({ isActive }) => (
+              <>
+                <span
+                  className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
+                    isActive ? 'bg-accent text-white' : 'text-muted'
+                  }`}
+                >
+                  <Icon />
+                </span>
+                <span className={isActive ? 'font-semibold text-ink' : ''}>{label}</span>
+              </>
+            )}
+          </NavLink>
+        ))}
+      </div>
     </nav>
   )
 }

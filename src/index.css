@@ -3,23 +3,28 @@
 @theme {
   --font-sans: ui-sans-serif, system-ui, -apple-system, sans-serif;
 
-  --color-bg: #faf6f0;
+  --color-bg: #f3f4f8;
   --color-surface: #ffffff;
-  --color-primary: #7a2e2e;
-  --color-primary-dark: #5e2222;
-  --color-accent: #f2c14e;
-  --color-ink: #241a15;
-  --color-muted: #8a7b6f;
-  --color-hairline: #e7ddd0;
-  --color-success: #3a7d44;
+  --color-primary: #16274d;
+  --color-primary-dark: #0a1530;
+  --color-accent: #ff6a3d;
+  --color-ink: #16213a;
+  --color-muted: #8890a4;
+  --color-hairline: #e9ebf2;
+  --color-success: #2f9e58;
   --color-warning: #d9a441;
-  --color-danger: #c0392b;
+  --color-danger: #e04545;
 
-  --radius-card: 16px;
+  --radius-card: 22px;
+  --radius-pill: 999px;
 }
 
 :root {
   color-scheme: light;
+}
+
+.hero-gradient {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
 }
 
 html,
