@@ -9,6 +9,9 @@ import { useStockSummary } from '../../hooks/useStockSummary'
 import { usePurchases } from '../../hooks/usePurchases'
 import { useDashboardMetrics } from '../../hooks/useDashboardMetrics'
 import { useStockLedger } from '../../hooks/useStockLedger'
+import { useOrders } from '../../hooks/useOrders'
+import { useDailyProductionList } from '../../hooks/useDailyProduction'
+import { computeLedgerStock } from '../../lib/stockLedger'
 
 function ChevronRight() {
   return (
@@ -38,6 +41,8 @@ export default function EstoqueList() {
   const { data: stock, isLoading: loadingStock, error: stockError } = useStockSummary()
   const { data: purchases, isLoading: loadingPurchases, error: purchasesError } = usePurchases()
   const { data: ledger } = useStockLedger()
+  const { data: allOrders } = useOrders()
+  const { data: production } = useDailyProductionList()
   const today = new Date().toISOString().slice(0, 10)
   const { data: metrics } = useDashboardMetrics(today, today)
 
@@ -46,9 +51,12 @@ export default function EstoqueList() {
       ? (Number(stock.total_loss_kg) / Number(stock.total_raw_weight_kg)) * 100
       : null
 
-  const stockWeight = stock ? Number(stock.stock_weight_kg) : 0
-  const hasShortfall = Number(metrics?.raw_material_needed_kg ?? 0) > 0
-  const isLowStock = Boolean(metrics?.is_low_stock)
+  const ledgerStock = computeLedgerStock(ledger, production, allOrders)
+  const stockWeight = ledgerStock ? ledgerStock.stockKg : stock ? Number(stock.stock_weight_kg) : 0
+  const pendingDemandKg = Number(metrics?.pending_demand_kg ?? 0)
+  const lowStockThresholdKg = Number(metrics?.low_stock_threshold_kg ?? 0)
+  const hasShortfall = pendingDemandKg > stockWeight
+  const isLowStock = stockWeight < lowStockThresholdKg
   const stockStatus = stockWeight <= 0 ? 'danger' : hasShortfall || isLowStock ? 'warning' : 'success'
 
   return (
@@ -80,8 +88,16 @@ export default function EstoqueList() {
                 <p className="text-sm text-white/80">Estoque disponível</p>
                 <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs font-semibold">{STOCK_STATUS[stockStatus].label}</span>
               </div>
-              <p className="text-3xl font-bold">{Number(stock.stock_weight_kg).toFixed(1)} kg</p>
-              <p className="text-sm text-white/80">{Number(stock.stock_quantity).toFixed(0)} unidades</p>
+              <p className="text-3xl font-bold">{stockWeight.toFixed(1)} kg</p>
+              {ledgerStock ? (
+                <p className="text-sm text-white/80">
+                  Saldo de {formatDate(ledgerStock.baseDate)} ({ledgerStock.baseBalanceKg.toFixed(1)} kg)
+                  {ledgerStock.entradaAfterKg > 0 && ` + ${ledgerStock.entradaAfterKg.toFixed(1)} kg produzidos`}
+                  {ledgerStock.saidaAfterKg > 0 && ` − ${ledgerStock.saidaAfterKg.toFixed(1)} kg vendidos`}
+                </p>
+              ) : (
+                stock && <p className="text-sm text-white/80">{Number(stock.stock_quantity).toFixed(0)} unidades</p>
+              )}
             </Card>
             {lossPct != null && (
               <Card className="grid grid-cols-2 gap-3">

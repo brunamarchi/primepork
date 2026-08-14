@@ -13,6 +13,7 @@ import { useOrders } from '../hooks/useOrders'
 import { useStockLedger } from '../hooks/useStockLedger'
 import { useDailyProductionList } from '../hooks/useDailyProduction'
 import { PERIOD_PRESETS, rangeForPreset } from '../lib/dateRanges'
+import { computeLedgerStock } from '../lib/stockLedger'
 import DashboardCharts from '../components/charts/DashboardCharts'
 
 function formatMoney(value) {
@@ -83,9 +84,16 @@ export default function Dashboard() {
     [allOrders, range.from, range.to],
   )
 
-  const hasShortfall = Number(data?.raw_material_needed_kg ?? 0) > 0
-  const isLowStock = Boolean(data?.is_low_stock)
-  const daysRemaining = data?.days_of_stock_remaining != null ? Math.round(data.days_of_stock_remaining) : null
+  const ledgerStock = computeLedgerStock(ledger, production, allOrders)
+  const stockWeightKg = ledgerStock ? ledgerStock.stockKg : Number(data?.stock_weight_kg ?? 0)
+  const pendingDemandKg = Number(data?.pending_demand_kg ?? 0)
+  const lowStockThresholdKg = Number(data?.low_stock_threshold_kg ?? 0)
+  const avgDailySalesKg = Number(data?.avg_daily_sales_kg ?? 0)
+
+  const shortfallKg = Math.max(pendingDemandKg - stockWeightKg, 0)
+  const hasShortfall = shortfallKg > 0
+  const isLowStock = stockWeightKg < lowStockThresholdKg
+  const daysRemaining = avgDailySalesKg > 0 ? Math.round(stockWeightKg / avgDailySalesKg) : null
   const isRunningOutSoon = daysRemaining != null && daysRemaining <= 7 && !hasShortfall
   const alertLevel = hasShortfall || isLowStock ? 'danger' : isRunningOutSoon ? 'warning' : 'ok'
 
@@ -99,7 +107,7 @@ export default function Dashboard() {
         ? 'bg-warning/15 text-warning'
         : 'bg-success/15 text-success'
 
-  const stockStatus = data && Number(data.stock_weight_kg) <= 0 ? 'danger' : hasShortfall || isLowStock ? 'warning' : 'success'
+  const stockStatus = stockWeightKg <= 0 ? 'danger' : hasShortfall || isLowStock ? 'warning' : 'success'
   const stockStatusIconClass = {
     danger: 'bg-danger/15 text-danger',
     warning: 'bg-warning/15 text-warning',
@@ -156,16 +164,14 @@ export default function Dashboard() {
           </div>
 
           {hasShortfall && (
-            <Link to="/estoque/nova" className="block transition-transform duration-150 ease-out active:scale-[0.98]">
+            <Link to="/producao/nova" className="block transition-transform duration-150 ease-out active:scale-[0.98]">
               <Card className="!border-danger/30 !bg-danger/10 flex items-start gap-3">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-danger/15 text-danger">
                   <IconAlertTriangle />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="font-semibold text-danger">Comprar matéria-prima</p>
-                  <p className="text-sm text-danger/80">
-                    ≈ {Number(data.raw_material_needed_kg).toFixed(1)} kg necessários para atender a demanda pendente
-                  </p>
+                  <p className="font-semibold text-danger">Produzir mais torresmo</p>
+                  <p className="text-sm text-danger/80">≈ {shortfallKg.toFixed(1)} kg necessários para atender a demanda pendente</p>
                 </div>
                 <IconChevronRight className="mt-2 text-danger/50" />
               </Card>
@@ -204,7 +210,7 @@ export default function Dashboard() {
                 <div className="min-w-0 flex-1">
                   <p className="text-sm text-muted">Disponível</p>
                   <div className="flex items-baseline gap-2">
-                    <p className="text-xl font-bold text-ink">{formatKg(data.stock_weight_kg)}</p>
+                    <p className="text-xl font-bold text-ink">{formatKg(stockWeightKg)}</p>
                     {stockStatusBadge}
                   </div>
                 </div>
