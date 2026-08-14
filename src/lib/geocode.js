@@ -1,11 +1,4 @@
-const ADDRESS_FIELDS = [
-  'address_street',
-  'address_number',
-  'address_neighborhood',
-  'address_city',
-  'address_state',
-  'address_zip',
-]
+const ADDRESS_FIELDS = ['address_street', 'address_neighborhood', 'address_zip']
 
 const MIN_INTERVAL_MS = 1100
 let lastRequestAt = 0
@@ -30,14 +23,7 @@ export function addressChanged(previous, next) {
 }
 
 function buildQuery(fields) {
-  const parts = [
-    [fields.address_street, fields.address_number].filter(Boolean).join(', '),
-    fields.address_neighborhood,
-    fields.address_city,
-    fields.address_state,
-    fields.address_zip,
-    'Brasil',
-  ].filter(Boolean)
+  const parts = [fields.address_street, fields.address_neighborhood, fields.address_zip, 'Brasil'].filter(Boolean)
   return parts.join(', ')
 }
 

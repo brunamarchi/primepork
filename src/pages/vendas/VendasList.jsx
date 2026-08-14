@@ -1,13 +1,16 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AppShell from '../../components/layout/AppShell'
 import Button from '../../components/ui/Button'
 import Card from '../../components/ui/Card'
+import { inputClass } from '../../components/ui/Field'
 import { SkeletonList } from '../../components/ui/Skeleton'
 import EmptyState from '../../components/ui/EmptyState'
 import ErrorBanner from '../../components/ui/ErrorBanner'
+import { IconChevronDown } from '../../components/icons'
 import { useOrders } from '../../hooks/useOrders'
 import { getDisplayPaymentStatus, PAYMENT_STATUS_LABELS, PAYMENT_STATUS_CLASSES } from '../../lib/paymentStatus'
+import { PERIOD_PRESETS, rangeForPreset } from '../../lib/dateRanges'
 
 const FILTERS = [
   { key: 'todos', label: 'Todos' },
@@ -17,6 +20,8 @@ const FILTERS = [
   { key: 'aberto', label: 'Em aberto' },
   { key: 'no_prazo', label: 'No prazo' },
 ]
+
+const SALES_PERIOD_PRESETS = [{ key: 'todos', label: 'Todo período' }, ...PERIOD_PRESETS]
 
 function matchesFilter(order, filter) {
   if (filter === 'todos') return true
@@ -35,8 +40,17 @@ function formatDate(iso) {
 
 export default function VendasList() {
   const [filter, setFilter] = useState('todos')
+  const [period, setPeriod] = useState('todos')
+  const [custom, setCustom] = useState(null)
   const { data: orders, isLoading, error } = useOrders()
-  const filteredOrders = orders?.filter((order) => matchesFilter(order, filter))
+
+  const range = useMemo(() => (period === 'todos' ? null : rangeForPreset(period, custom)), [period, custom])
+
+  const filteredOrders = orders?.filter((order) => {
+    if (!matchesFilter(order, filter)) return false
+    if (range && (order.order_date < range.from || order.order_date > range.to)) return false
+    return true
+  })
 
   return (
     <AppShell
@@ -47,6 +61,38 @@ export default function VendasList() {
         </Button>
       }
     >
+      <div className="relative mb-3 lg:max-w-xs">
+        <select
+          value={period}
+          onChange={(e) => setPeriod(e.target.value)}
+          className={`${inputClass} w-full appearance-none pr-10 font-medium`}
+        >
+          {SALES_PERIOD_PRESETS.map((p) => (
+            <option key={p.key} value={p.key}>
+              {p.label}
+            </option>
+          ))}
+        </select>
+        <IconChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted" />
+      </div>
+
+      {period === 'personalizado' && (
+        <div className="mb-3 grid grid-cols-2 gap-3 lg:max-w-xs">
+          <input
+            type="date"
+            className={inputClass}
+            value={custom?.from ?? range?.from ?? ''}
+            onChange={(e) => setCustom({ from: e.target.value, to: custom?.to ?? range?.to ?? e.target.value })}
+          />
+          <input
+            type="date"
+            className={inputClass}
+            value={custom?.to ?? range?.to ?? ''}
+            onChange={(e) => setCustom({ from: custom?.from ?? range?.from ?? e.target.value, to: e.target.value })}
+          />
+        </div>
+      )}
+
       <div className="mb-4 flex gap-2 overflow-x-auto">
         {FILTERS.map((f) => (
           <button

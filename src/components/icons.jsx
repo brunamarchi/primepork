@@ -47,6 +47,19 @@ export function IconMap() {
   )
 }
 
+export function IconFlame() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path
+        d="M12 2.5c1 3 .3 4.4-1 6-1.4 1.8-2.5 3-2.5 5.2A5.5 5.5 0 0 0 14 19a4.2 4.2 0 0 0 3-7c1.5 1 2 2.5 2 4a5.5 5.5 0 0 1-2 4.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M12 2.5c-1.2 3.5 1 5 1 7.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 export function IconLogout() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

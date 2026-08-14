@@ -6,6 +6,7 @@ export const PERIOD_PRESETS = [
   { key: 'hoje', label: 'Hoje' },
   { key: 'semana', label: 'Semana' },
   { key: 'mes', label: 'Mês' },
+  { key: 'ano', label: 'Ano' },
   { key: 'personalizado', label: 'Personalizado' },
 ]
 
@@ -26,6 +27,11 @@ export function rangeForPreset(preset, custom) {
 
   if (preset === 'mes') {
     const first = new Date(today.getFullYear(), today.getMonth(), 1)
+    return { from: toISODate(first), to: todayISO }
+  }
+
+  if (preset === 'ano') {
+    const first = new Date(today.getFullYear(), 0, 1)
     return { from: toISODate(first), to: todayISO }
   }
 

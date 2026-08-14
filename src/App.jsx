@@ -13,6 +13,9 @@ import ClientesList from './pages/clientes/ClientesList'
 import NovoCliente from './pages/clientes/NovoCliente'
 import ClienteDetalhe from './pages/clientes/ClienteDetalhe'
 import Mapa from './pages/mapa/Mapa'
+import ProducaoDiaria from './pages/producao/ProducaoDiaria'
+import NovaProducao from './pages/producao/NovaProducao'
+import DetalheProducao from './pages/producao/DetalheProducao'
 
 export default function App() {
   return (
@@ -30,6 +33,9 @@ export default function App() {
       <Route path="/clientes/novo" element={<ProtectedRoute><NovoCliente /></ProtectedRoute>} />
       <Route path="/clientes/:id" element={<ProtectedRoute><ClienteDetalhe /></ProtectedRoute>} />
       <Route path="/mapa" element={<ProtectedRoute><Mapa /></ProtectedRoute>} />
+      <Route path="/producao" element={<ProtectedRoute><ProducaoDiaria /></ProtectedRoute>} />
+      <Route path="/producao/nova" element={<ProtectedRoute><NovaProducao /></ProtectedRoute>} />
+      <Route path="/producao/:id" element={<ProtectedRoute><DetalheProducao /></ProtectedRoute>} />
     </Routes>
   )
 }

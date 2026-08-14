@@ -8,6 +8,7 @@ import ErrorBanner from '../../components/ui/ErrorBanner'
 import { useStockSummary } from '../../hooks/useStockSummary'
 import { usePurchases } from '../../hooks/usePurchases'
 import { useDashboardMetrics } from '../../hooks/useDashboardMetrics'
+import { useStockLedger } from '../../hooks/useStockLedger'
 
 function ChevronRight() {
   return (
@@ -36,6 +37,7 @@ function lossBadgeClass(pct) {
 export default function EstoqueList() {
   const { data: stock, isLoading: loadingStock, error: stockError } = useStockSummary()
   const { data: purchases, isLoading: loadingPurchases, error: purchasesError } = usePurchases()
+  const { data: ledger } = useStockLedger()
   const today = new Date().toISOString().slice(0, 10)
   const { data: metrics } = useDashboardMetrics(today, today)
 
@@ -139,6 +141,48 @@ export default function EstoqueList() {
           )
         })}
       </div>
+
+      {ledger && ledger.length > 0 && (
+        <div className="mt-6">
+          <p className="mb-1 text-sm font-semibold text-ink">Histórico da planilha</p>
+          <p className="mb-2 text-xs text-muted">
+            Livro-razão diário importado da planilha original. Último saldo conhecido:{' '}
+            <strong>{Number(ledger[0].closing_balance_kg).toFixed(2)} kg</strong> em {formatDate(ledger[0].ledger_date)}.
+          </p>
+          <div className="overflow-x-auto rounded-card border border-hairline bg-surface">
+            <table className="w-full min-w-[480px] text-sm">
+              <thead>
+                <tr className="border-b border-hairline text-left text-xs text-muted">
+                  <th className="px-3 py-2 font-medium">Data</th>
+                  <th className="px-3 py-2 font-medium">Saldo inicial</th>
+                  <th className="px-3 py-2 font-medium">Entrada</th>
+                  <th className="px-3 py-2 font-medium">Saída</th>
+                  <th className="px-3 py-2 font-medium">Saldo final</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ledger.map((row) => (
+                  <tr key={row.id} className="border-b border-hairline last:border-0">
+                    <td className="whitespace-nowrap px-3 py-2 text-ink">{formatDate(row.ledger_date)}</td>
+                    <td className="whitespace-nowrap px-3 py-2 text-muted">
+                      {row.opening_balance_kg != null ? `${Number(row.opening_balance_kg).toFixed(2)} kg` : '—'}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-2 text-success">
+                      {row.incoming_kg != null ? `+${Number(row.incoming_kg).toFixed(2)} kg` : '—'}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-2 text-danger">
+                      {row.outgoing_kg != null ? `−${Number(row.outgoing_kg).toFixed(2)} kg` : '—'}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-2 font-semibold text-ink">
+                      {row.closing_balance_kg != null ? `${Number(row.closing_balance_kg).toFixed(2)} kg` : '—'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </AppShell>
   )
 }

@@ -1,10 +1,11 @@
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
-import { IconHome, IconBox, IconCart, IconUsers, IconMap, IconLogout } from '../icons'
+import { IconHome, IconBox, IconFlame, IconCart, IconUsers, IconMap, IconLogout } from '../icons'
 
 const TABS = [
   { to: '/', label: 'Painel', icon: IconHome },
   { to: '/estoque', label: 'Estoque', icon: IconBox },
+  { to: '/producao', label: 'Produção', icon: IconFlame },
   { to: '/vendas', label: 'Vendas', icon: IconCart },
   { to: '/clientes', label: 'Clientes', icon: IconUsers },
   { to: '/mapa', label: 'Mapa', icon: IconMap },

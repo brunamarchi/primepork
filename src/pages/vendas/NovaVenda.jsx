@@ -38,6 +38,10 @@ export default function NovaVenda() {
           </Field>
         </div>
         <OrderFieldsForm
+          key={selectedClient?.id ?? 'none'}
+          initialValues={
+            selectedClient ? { payment_term: selectedClient.payment_term ?? '', unit_price: selectedClient.current_price ?? '' } : undefined
+          }
           submitLabel="Lançar venda"
           onSubmit={handleSubmit}
           submitting={isPending}

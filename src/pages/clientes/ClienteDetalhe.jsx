@@ -88,6 +88,36 @@ export default function ClienteDetalhe() {
               <p className="font-medium text-ink">{client.document}</p>
             </>
           )}
+          {client.contact_name && (
+            <>
+              <p className="mt-2 text-sm text-muted">Contato</p>
+              <p className="font-medium text-ink">{client.contact_name}</p>
+            </>
+          )}
+          {(client.address_street || client.address_neighborhood || client.address_zip) && (
+            <>
+              <p className="mt-2 text-sm text-muted">Endereço</p>
+              <p className="font-medium text-ink">
+                {[client.address_street, client.address_neighborhood, client.address_zip].filter(Boolean).join(' · ')}
+              </p>
+            </>
+          )}
+          {(client.payment_term || client.current_price != null) && (
+            <div className="mt-2 grid grid-cols-2 gap-3">
+              {client.payment_term && (
+                <div>
+                  <p className="text-sm text-muted">Prazo de pagamento</p>
+                  <p className="font-medium text-ink">{client.payment_term}</p>
+                </div>
+              )}
+              {client.current_price != null && (
+                <div>
+                  <p className="text-sm text-muted">Preço atual</p>
+                  <p className="font-medium text-ink">R$ {Number(client.current_price).toFixed(2)}/kg</p>
+                </div>
+              )}
+            </div>
+          )}
         </Card>
 
         <Card>

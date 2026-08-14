@@ -85,18 +85,56 @@ export default function PedidoDetalhe() {
               {order.status}
             </span>
           </div>
-          <div>
-            <p className="text-sm text-muted">Quantidade</p>
-            <p className="font-medium text-ink">{order.quantity} un.</p>
-          </div>
+          {order.order_number != null && (
+            <div>
+              <p className="text-sm text-muted">Nº do pedido</p>
+              <p className="font-medium text-ink">{order.order_number}</p>
+            </div>
+          )}
+          {order.nf_number && (
+            <div>
+              <p className="text-sm text-muted">NF</p>
+              <p className="font-medium text-ink">{order.nf_number}</p>
+            </div>
+          )}
+          {order.product_description && (
+            <div className="col-span-2">
+              <p className="text-sm text-muted">Descrição</p>
+              <p className="font-medium text-ink">{order.product_description}</p>
+            </div>
+          )}
           <div>
             <p className="text-sm text-muted">Peso</p>
             <p className="font-medium text-ink">{order.weight_kg} kg</p>
           </div>
+          {order.unit_price != null && (
+            <div>
+              <p className="text-sm text-muted">Valor unitário</p>
+              <p className="font-medium text-ink">R$ {order.unit_price}/kg</p>
+            </div>
+          )}
           <div>
             <p className="text-sm text-muted">Valor total</p>
             <p className="font-medium text-ink">R$ {order.total_price}</p>
           </div>
+          {order.payment_term && (
+            <div>
+              <p className="text-sm text-muted">Prazo</p>
+              <p className="font-medium text-ink">{order.payment_term}</p>
+            </div>
+          )}
+          {order.payment_method && (
+            <div>
+              <p className="text-sm text-muted">Forma de pagamento</p>
+              <p className="font-medium text-ink">{order.payment_method}</p>
+            </div>
+          )}
+          {order.freight && (
+            <div>
+              <p className="text-sm text-muted">Frete</p>
+              <p className="font-medium text-ink">{order.freight}</p>
+            </div>
+          )}
           <div>
             <p className="text-sm text-muted">Pagamento</p>
             <span className={`inline-block rounded-full px-2 py-1 text-xs font-medium ${PAYMENT_STATUS_CLASSES[paymentStatus]}`}>

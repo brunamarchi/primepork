@@ -9,7 +9,11 @@ import { inputClass } from '../components/ui/Field'
 import { useAuth } from '../hooks/useAuth'
 import { useDashboardMetrics } from '../hooks/useDashboardMetrics'
 import { useClientRiskSummary } from '../hooks/useClientPurchaseStats'
+import { useOrders } from '../hooks/useOrders'
+import { useStockLedger } from '../hooks/useStockLedger'
+import { useDailyProductionList } from '../hooks/useDailyProduction'
 import { PERIOD_PRESETS, rangeForPreset } from '../lib/dateRanges'
+import DashboardCharts from '../components/charts/DashboardCharts'
 
 function formatMoney(value) {
   return Number(value ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -70,6 +74,14 @@ export default function Dashboard() {
   const range = useMemo(() => rangeForPreset(preset, custom), [preset, custom])
   const { data, isLoading, error } = useDashboardMetrics(range.from, range.to)
   const { data: riskCounts } = useClientRiskSummary()
+  const { data: allOrders } = useOrders()
+  const { data: ledger } = useStockLedger()
+  const { data: production } = useDailyProductionList()
+
+  const periodOrders = useMemo(
+    () => allOrders?.filter((o) => o.order_date >= range.from && o.order_date <= range.to),
+    [allOrders, range.from, range.to],
+  )
 
   const hasShortfall = Number(data?.raw_material_needed_kg ?? 0) > 0
   const isLowStock = Boolean(data?.is_low_stock)
@@ -285,6 +297,8 @@ export default function Dashboard() {
               </Card>
             </div>
           </div>
+
+          <DashboardCharts periodOrders={periodOrders} allOrders={allOrders} ledger={ledger} production={production} />
         </div>
       )}
     </AppShell>

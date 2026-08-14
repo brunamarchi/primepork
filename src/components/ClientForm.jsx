@@ -5,17 +5,14 @@ import ErrorBanner from './ui/ErrorBanner'
 
 const EMPTY = {
   full_name: '',
-  phone: '',
   document: '',
-  email: '',
-  address_zip: '',
   address_street: '',
-  address_number: '',
   address_neighborhood: '',
-  address_city: '',
-  address_state: '',
-  address_complement: '',
-  notes: '',
+  address_zip: '',
+  contact_name: '',
+  phone: '',
+  payment_term: '',
+  current_price: '',
 }
 
 export default function ClientForm({ initialValues, submitLabel = 'Salvar cliente', onSubmit, submitting, error }) {
@@ -27,69 +24,50 @@ export default function ClientForm({ initialValues, submitLabel = 'Salvar client
 
   function handleSubmit(e) {
     e.preventDefault()
-    onSubmit(values)
+    onSubmit({ ...values, current_price: values.current_price === '' ? null : Number(values.current_price) })
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <Field label="Nome / Razão social" required>
+      <Field label="Nome" required>
         <input required className={inputClass} value={values.full_name} onChange={set('full_name')} />
       </Field>
-      <Field label="Telefone / WhatsApp" required>
+      <Field label="CNPJ/CPF">
+        <input className={inputClass} value={values.document} onChange={set('document')} />
+      </Field>
+      <Field label="Endereço">
+        <input className={inputClass} value={values.address_street} onChange={set('address_street')} />
+      </Field>
+      <div className="grid grid-cols-2 gap-3">
+        <Field label="Bairro">
+          <input className={inputClass} value={values.address_neighborhood} onChange={set('address_neighborhood')} />
+        </Field>
+        <Field label="CEP">
+          <input className={inputClass} value={values.address_zip} onChange={set('address_zip')} />
+        </Field>
+      </div>
+      <Field label="Contato">
+        <input className={inputClass} value={values.contact_name} onChange={set('contact_name')} />
+      </Field>
+      <Field label="Telefone" required>
         <input required type="tel" className={inputClass} value={values.phone} onChange={set('phone')} />
       </Field>
-
       <div className="grid grid-cols-2 gap-3">
-        <Field label="CPF/CNPJ">
-          <input className={inputClass} value={values.document} onChange={set('document')} />
+        <Field label="Prazo de pagamento" hint="Ex: 7 DD, 14 DD, A vista">
+          <input className={inputClass} value={values.payment_term} onChange={set('payment_term')} />
         </Field>
-        <Field label="E-mail">
-          <input type="email" className={inputClass} value={values.email} onChange={set('email')} />
+        <Field label="Preço atual (R$/kg)">
+          <input
+            type="number"
+            step="0.01"
+            min="0"
+            inputMode="decimal"
+            className={inputClass}
+            value={values.current_price}
+            onChange={set('current_price')}
+          />
         </Field>
       </div>
-
-      <div className="mt-2 border-t border-hairline pt-4">
-        <p className="mb-3 text-sm font-semibold text-ink">
-          Endereço <span className="font-normal text-muted">(opcional — necessário para aparecer no mapa)</span>
-        </p>
-        <div className="flex flex-col gap-3">
-          <div className="grid grid-cols-3 gap-3">
-            <Field label="CEP">
-              <input className={inputClass} value={values.address_zip} onChange={set('address_zip')} />
-            </Field>
-            <div className="col-span-2">
-              <Field label="Rua">
-                <input className={inputClass} value={values.address_street} onChange={set('address_street')} />
-              </Field>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Número">
-              <input className={inputClass} value={values.address_number} onChange={set('address_number')} />
-            </Field>
-            <Field label="Complemento">
-              <input className={inputClass} value={values.address_complement} onChange={set('address_complement')} />
-            </Field>
-          </div>
-          <Field label="Bairro">
-            <input className={inputClass} value={values.address_neighborhood} onChange={set('address_neighborhood')} />
-          </Field>
-          <div className="grid grid-cols-3 gap-3">
-            <div className="col-span-2">
-              <Field label="Cidade">
-                <input className={inputClass} value={values.address_city} onChange={set('address_city')} />
-              </Field>
-            </div>
-            <Field label="UF">
-              <input maxLength={2} className={`${inputClass} uppercase`} value={values.address_state} onChange={set('address_state')} />
-            </Field>
-          </div>
-        </div>
-      </div>
-
-      <Field label="Observações">
-        <textarea rows={3} className={inputClass} value={values.notes} onChange={set('notes')} />
-      </Field>
 
       <ErrorBanner message={error} />
 
