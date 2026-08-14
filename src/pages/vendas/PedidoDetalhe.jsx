@@ -143,6 +143,9 @@ export default function PedidoDetalhe() {
             {paymentStatus !== 'pago' && order.payment_due_date && (
               <p className="mt-1 text-xs text-muted">Previsto para {formatDate(order.payment_due_date)}</p>
             )}
+            {paymentStatus === 'pago' && order.paid_at && (
+              <p className="mt-1 text-xs text-muted">Pago em {formatDate(order.paid_at.slice(0, 10))}</p>
+            )}
           </div>
         </Card>
 
