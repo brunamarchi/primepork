@@ -1,5 +1,5 @@
-import { useMemo } from 'react'
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import { useEffect, useMemo } from 'react'
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { Link } from 'react-router-dom'
@@ -23,6 +23,19 @@ function pinIcon(color) {
   })
 }
 
+function FitBounds({ points }) {
+  const map = useMap()
+  useEffect(() => {
+    if (points.length === 0) return
+    if (points.length === 1) {
+      map.setView(points[0], 14)
+      return
+    }
+    map.fitBounds(L.latLngBounds(points), { padding: [32, 32], maxZoom: 15 })
+  }, [map, points])
+  return null
+}
+
 function formatDate(iso) {
   if (!iso) return '—'
   return new Date(iso + 'T00:00:00').toLocaleDateString('pt-BR')
@@ -35,6 +48,7 @@ export default function Mapa() {
   const located = useMemo(() => clients?.filter((c) => c.geocode_status === 'success' && c.lat != null) ?? [], [clients])
   const unlocated = (clients?.length ?? 0) - located.length
   const statsByClient = useMemo(() => Object.fromEntries((stats ?? []).map((s) => [s.client_id, s])), [stats])
+  const points = useMemo(() => located.map((c) => [c.lat, c.lng]), [located])
 
   return (
     <AppShell title="Mapa de clientes">
@@ -65,6 +79,7 @@ export default function Mapa() {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
+              <FitBounds points={points} />
               {located.map((client) => {
                 const clientStats = statsByClient[client.id]
                 const { status, daysUntilPredicted } = getClientRepurchaseStatus(clientStats)
