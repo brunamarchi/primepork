@@ -14,6 +14,7 @@ import { useStockLedger } from '../hooks/useStockLedger'
 import { useDailyProductionList } from '../hooks/useDailyProduction'
 import { PERIOD_PRESETS, rangeForPreset } from '../lib/dateRanges'
 import { computeLedgerStock } from '../lib/stockLedger'
+import { getDisplayPaymentStatus } from '../lib/paymentStatus'
 import DashboardCharts from '../components/charts/DashboardCharts'
 
 function formatMoney(value) {
@@ -100,6 +101,21 @@ export default function Dashboard() {
   const avgTicket = data && data.orders_count_period > 0 ? Number(data.revenue_period) / Number(data.orders_count_period) : null
   const lossPct = data?.avg_yield_ratio != null ? (1 - Number(data.avg_yield_ratio)) * 100 : null
 
+  const { receivable, overdue } = useMemo(() => {
+    const acc = { receivable: { total: 0, count: 0 }, overdue: { total: 0, count: 0 } }
+    for (const o of allOrders ?? []) {
+      const status = getDisplayPaymentStatus(o)
+      if (status === 'previsto') {
+        acc.receivable.total += Number(o.total_price)
+        acc.receivable.count += 1
+      } else if (status === 'atrasado') {
+        acc.overdue.total += Number(o.total_price)
+        acc.overdue.count += 1
+      }
+    }
+    return acc
+  }, [allOrders])
+
   const alertPillClass =
     alertLevel === 'danger'
       ? 'bg-danger/15 text-danger'
@@ -183,19 +199,17 @@ export default function Dashboard() {
               <p className="mb-2 text-sm font-semibold text-ink">Financeiro</p>
               <Card className="grid grid-cols-2 gap-3">
                 <div>
-                  <p className="text-sm text-muted">A receber</p>
-                  <p className="text-xl font-bold text-ink">{formatMoney(data.receivable_total)}</p>
+                  <p className="text-sm text-muted">A receber (no prazo)</p>
+                  <p className="text-xl font-bold text-ink">{formatMoney(receivable.total)}</p>
                   <p className="text-xs text-muted">
-                    {data.receivable_count} pedido{data.receivable_count === 1 ? '' : 's'}
+                    {receivable.count} pedido{receivable.count === 1 ? '' : 's'}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-muted">Atrasado</p>
-                  <p className={`text-xl font-bold ${Number(data.overdue_total) > 0 ? 'text-danger' : 'text-ink'}`}>
-                    {formatMoney(data.overdue_total)}
-                  </p>
+                  <p className={`text-xl font-bold ${overdue.total > 0 ? 'text-danger' : 'text-ink'}`}>{formatMoney(overdue.total)}</p>
                   <p className="text-xs text-muted">
-                    {data.overdue_count} pedido{data.overdue_count === 1 ? '' : 's'}
+                    {overdue.count} pedido{overdue.count === 1 ? '' : 's'}
                   </p>
                 </div>
               </Card>
