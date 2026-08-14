@@ -106,12 +106,44 @@ textarea {
   }
 }
 
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
 .animate-page-in {
   animation: fade-slide-up 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .animate-toast-in {
   animation: toast-in 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out both;
+}
+
+.animate-sheet-up {
+  animation: sheet-up 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (min-width: 1024px) {
+  .animate-sheet-up {
+    animation: fade-slide-up 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
 }
 
 .skeleton {

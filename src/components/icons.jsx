@@ -85,3 +85,27 @@ export function IconChevronDown({ className = '' }) {
     </svg>
   )
 }
+
+export function IconPlus({ className = '' }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" className={`shrink-0 ${className}`}>
+      <path d="M12 5v14M5 12h14" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+export function IconX({ className = '' }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className={`shrink-0 ${className}`}>
+      <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+export function IconCheck({ className = '' }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" className={`shrink-0 ${className}`}>
+      <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}

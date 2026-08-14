@@ -173,7 +173,7 @@ export default function Dashboard() {
                   <IconPlus /> Nova compra
                 </Button>
                 <Button to="/vendas/nova" variant="success" className="flex-1 lg:flex-none lg:px-6">
-                  <IconPlus /> Nova venda
+                  <IconPlus /> Novo pedido
                 </Button>
               </div>
             </div>

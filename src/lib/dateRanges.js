@@ -35,5 +35,10 @@ export function rangeForPreset(preset, custom) {
     return { from: toISODate(first), to: todayISO }
   }
 
+  if (preset === '3meses') {
+    const start = new Date(today.getFullYear(), today.getMonth() - 3, today.getDate())
+    return { from: toISODate(start), to: todayISO }
+  }
+
   return custom ?? { from: todayISO, to: todayISO }
 }

@@ -25,12 +25,12 @@ export default function NovaVenda() {
   async function handleSubmit(fields) {
     if (!selectedClient) return
     await mutateAsync({ ...fields, client_id: selectedClient.id })
-    showToast('Venda lançada com sucesso.')
+    showToast('Pedido lançado com sucesso.')
     navigate('/vendas', { replace: true })
   }
 
   return (
-    <AppShell title="Nova venda">
+    <AppShell title="Novo pedido">
       <div className="lg:max-w-xl">
         <div className="mb-4">
           <Field label="Cliente" required>
@@ -42,7 +42,7 @@ export default function NovaVenda() {
           initialValues={
             selectedClient ? { payment_term: selectedClient.payment_term ?? '', unit_price: selectedClient.current_price ?? '' } : undefined
           }
-          submitLabel="Lançar venda"
+          submitLabel="Lançar pedido"
           onSubmit={handleSubmit}
           submitting={isPending}
           error={error?.message}
